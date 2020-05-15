@@ -1,9 +1,6 @@
 androidbinary
 =====
 
-[![Build Status](https://github.com/shogo82148/androidbinary/workflows/Test/badge.svg)](https://github.com/shogo82148/androidbinary/actions)
-[![GoDoc](https://godoc.org/github.com/shogo82148/androidbinary?status.svg)](https://godoc.org/github.com/shogo82148/androidbinary)
-
 Android binary file parser
 
 ## High Level API
@@ -14,7 +11,7 @@ Android binary file parser
 package main
 
 import (
-	"github.com/shogo82148/androidbinary/apk"
+	"github.com/gsp412/androidbinary/apk"
 )
 
 func main() {
@@ -22,7 +19,16 @@ func main() {
 	defer pkg.Close()
 
 	icon, _ := pkg.Icon(nil) // returns the icon of APK as image.Image
-	pkgName := pkg.PackageName() // returns the package name
+	
+	pkgName := pkg.PackageName() // returns the package name.
+	
+	label, _ := apk.Label(nil) // returns the APK lable.
+	
+	versionCode := apk.VersionCode() // returns the version code.
+	
+	versionName := apk.VersionName() // returns the version name.
+	
+	publicKey := apk.PublicKey() // returns the cret public key.
 }
 ```
 
@@ -36,8 +42,8 @@ package main
 import (
 	"encoding/xml"
 
-	"github.com/shogo82148/androidbinary"
-	"github.com/shogo82148/androidbinary/apk"
+	"github.com/gsp412/androidbinary"
+	"github.com/gsp412/androidbinary/apk"
 )
 
 func main() {
@@ -59,7 +65,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/shogo82148/androidbinary"
+	"github.com/gsp412/androidbinary"
 )
 
 func main() {
@@ -67,6 +73,25 @@ func main() {
 	rsc, _ := androidbinary.NewTableFile(f)
 	resource, _ := rsc.GetResource(androidbinary.ResID(0xCAFEBABE), nil)
 	fmt.Println(resource)
+}
+```
+
+### Parse Cert files
+
+``` go
+package main
+
+import (
+	"fmt"
+	"github.com/gsp412/androidbinary"
+)
+
+func main() {
+    b, _ := ioutil.ReadFile("CERT.RSA")
+
+    c, _ := androidbinary.NewCertFile(b)
+
+	fmt.Println(c.PublicKey)
 }
 ```
 

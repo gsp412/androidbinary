@@ -1,7 +1,6 @@
 package apk
 
 import (
-	"archive/zip"
 	"bytes"
 	"fmt"
 	"image"
@@ -9,7 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/shogo82148/androidbinary"
+	"archive/zip"
+	"github.com/gsp412/androidbinary"
 
 	_ "image/jpeg" // handle jpeg format
 	_ "image/png"  // handle png format
@@ -21,6 +21,7 @@ type Apk struct {
 	zipreader *zip.Reader
 	manifest  Manifest
 	table     *androidbinary.TableFile
+	cert      *androidbinary.CertFile
 }
 
 // OpenFile will open the file specified by filename and return Apk
@@ -61,6 +62,10 @@ func OpenZipReader(r io.ReaderAt, size int64) (*Apk, error) {
 	if err = apk.parseManifest(); err != nil {
 		return nil, errorf("parse-manifest: %w", err)
 	}
+	if err = apk.parseCert(); err != nil {
+		apk.cert = nil
+	}
+
 	return apk, nil
 }
 
@@ -109,6 +114,24 @@ func (k *Apk) Manifest() Manifest {
 // PackageName returns the package name of the APK.
 func (k *Apk) PackageName() string {
 	return k.manifest.Package.MustString()
+}
+
+// VersionCode return the version code of the APK.
+func (k *Apk) VersionCode() int32 {
+	return k.manifest.VersionCode.MustInt32()
+}
+
+// VersionCode return the version name of the APK.
+func (k *Apk) VersionName() string {
+	return k.manifest.VersionName.MustString()
+}
+
+// PublicKey if apk has sign return the public key.
+func (k *Apk) PublicKey() string {
+	if nil != k.cert {
+		return k.cert.PublicKey
+	}
+	return ""
 }
 
 func isMainIntentFilter(intent ActivityIntentFilter) bool {
@@ -172,6 +195,15 @@ func (k *Apk) parseResources() (err error) {
 		return
 	}
 	k.table, err = androidbinary.NewTableFile(bytes.NewReader(resData))
+	return
+}
+
+func (k *Apk) parseCert() (err error) {
+	resData, err := k.readZipFile("META-INF/CERT.RSA")
+	if err != nil {
+		return
+	}
+	k.cert, err = androidbinary.NewCertFile(resData)
 	return
 }
 
