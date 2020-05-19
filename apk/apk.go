@@ -9,10 +9,11 @@ import (
 	"strconv"
 
 	"archive/zip"
-	"github.com/gsp412/androidbinary"
-
 	_ "image/jpeg" // handle jpeg format
 	_ "image/png"  // handle png format
+	"path/filepath"
+
+	"github.com/gsp412/androidbinary"
 )
 
 // Apk is an application package file for android.
@@ -199,7 +200,7 @@ func (k *Apk) parseResources() (err error) {
 }
 
 func (k *Apk) parseCert() (err error) {
-	resData, err := k.readZipFile("META-INF/CERT.RSA")
+	resData, err := k.readZipFile("META-INF/*.RSA")
 	if err != nil {
 		return
 	}
@@ -210,7 +211,7 @@ func (k *Apk) parseCert() (err error) {
 func (k *Apk) readZipFile(name string) (data []byte, err error) {
 	buf := bytes.NewBuffer(nil)
 	for _, file := range k.zipreader.File {
-		if file.Name != name {
+		if ok, _ := filepath.Match(name, file.Name); !ok {
 			continue
 		}
 		rc, er := file.Open()
