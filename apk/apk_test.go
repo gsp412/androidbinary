@@ -5,6 +5,7 @@ import (
 	_ "image/png"
 	"testing"
 
+	"github.com/gsp412/androidbinary"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -27,7 +28,12 @@ func TestParseAPKFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, icon)
 
-	label, err := apk.Label(nil)
+	config := &androidbinary.ResTableConfig{
+	    Language: [2]uint8{'z', 'h'},
+        Country:  [2]uint8{'C', 'N'},
+	}
+
+	label, err := apk.Label(config)
 	assert.NoError(t, err)
 	assert.Equal(t, "中国农历", label)
 	t.Log("app label:", label)
