@@ -200,7 +200,7 @@ func (k *Apk) parseResources() (err error) {
 }
 
 func (k *Apk) parseCert() (err error) {
-	resData, err := k.readZipFile("META-INF/*.RSA")
+	resData, err := k.readZipFile("META-INF/*.?SA")
 	if err != nil {
 		return
 	}

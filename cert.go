@@ -4,6 +4,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+
 	"github.com/gsp412/androidbinary/libs/pkcs7"
 )
 
@@ -27,14 +28,9 @@ func NewCertFile(b []byte) (c *CertFile, err error) {
 
 	c.Cert = _pkcs7.Certificates[0]
 
-	pk_bytes, err := x509.MarshalPKIXPublicKey(c.Cert.PublicKey)
-	if err != nil {
-		return
-	}
-
 	block := &pem.Block{
-		Type  : "RSA PUBLIC KEY",
-		Bytes :  pk_bytes,
+		Type:  c.Cert.PublicKeyAlgorithm.String() + " PUBLIC KEY",
+		Bytes: c.Cert.RawSubjectPublicKeyInfo,
 	}
 
 	c.PublicKey = string(pem.EncodeToMemory(block))
