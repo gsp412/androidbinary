@@ -29,8 +29,8 @@ func TestParseAPKFile(t *testing.T) {
 	assert.NotNil(t, icon)
 
 	config := &androidbinary.ResTableConfig{
-	    Language: [2]uint8{'z', 'h'},
-        Country:  [2]uint8{'C', 'N'},
+		Language: [2]uint8{'z', 'h'},
+		Country:  [2]uint8{'C', 'N'},
 	}
 
 	label, err := apk.Label(config)

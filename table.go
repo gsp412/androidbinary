@@ -290,6 +290,8 @@ func (f *TableFile) GetResource(id ResID, config *ResTableConfig) (interface{}, 
 		return v.Data, nil
 	case TypeIntBoolean:
 		return v.Data != 0, nil
+	case TypeReference:
+		return f.GetResource(ResID(v.Data), config)
 	}
 	return v.Data, nil
 }
